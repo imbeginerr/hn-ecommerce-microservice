@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.hn.hncommonservice.exception.AppException;
 import vn.hn.hncommonservice.exception.ErrorCode;
 import vn.hn.hncommonservice.utils.CoreUtils;
-import vn.hn.hncoreservice.constant.PredefinedRole;
 import vn.hn.hncoreservice.dao.model.Role;
 import vn.hn.hncoreservice.dao.model.User;
 import vn.hn.hncoreservice.dao.service.RoleService;
@@ -22,6 +21,7 @@ import vn.hn.hncoreservice.data.request.UserUpdateRequest;
 import vn.hn.hncoreservice.data.response.UserCreateResponse;
 import vn.hn.hncoreservice.data.response.UserResponse;
 import vn.hn.hncoreservice.data.response.UserUpdateResponse;
+import vn.hn.hncoreservice.enums.Roles;
 import vn.hn.hncoreservice.mapper.UserMapper;
 
 import java.util.HashSet;
@@ -46,7 +46,7 @@ public class UserBusiness {
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 		
 		HashSet<Role> roles = new HashSet<>();
-		roleService.findByName(PredefinedRole.USER_ROLE).ifPresent(roles::add);
+		roleService.findByName(Roles.USER.getValue()).ifPresent(roles::add);
 		user.setRoles(roles);
 		User savedUser = userService.save(user);
 		

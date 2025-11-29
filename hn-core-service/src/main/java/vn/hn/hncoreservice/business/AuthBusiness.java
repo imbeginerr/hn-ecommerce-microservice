@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import vn.hn.hncommonservice.exception.AppException;
 import vn.hn.hncommonservice.exception.ErrorCode;
+import vn.hn.hncoreservice.dao.model.InvalidatedToken;
 import vn.hn.hncoreservice.dao.model.User;
+import vn.hn.hncoreservice.dao.service.InvalidatedTokenService;
 import vn.hn.hncoreservice.dao.service.UserService;
 import vn.hn.hncoreservice.data.request.AuthenticationRequest;
 import vn.hn.hncoreservice.data.request.IntrospectRequest;
@@ -32,6 +35,7 @@ import java.util.UUID;
 public class AuthBusiness {
 	
 	private final UserService userService;
+	private final InvalidatedTokenService invalidatedTokenService;
 	
 	@NonFinal
 	@Value("${jwt.signer-key}")
@@ -74,18 +78,27 @@ public class AuthBusiness {
 		IntrospectRespone introspectRespone = new IntrospectRespone();
 		try {
 			verifyToken(introspectRequest.getToken());
-			introspectRespone.setValid(true);
-			return introspectRespone;
 		} catch (JWTVerificationException e) {
 			introspectRespone.setValid(false);
-			return introspectRespone;
 		}
+		introspectRespone.setValid(true);
+		return introspectRespone;
 	}
 	
-	private JWTVerifier verifyToken(String token) {
-		JWTVerifier verifier = JWT.require(Algorithm.HMAC256(JWT_SECRET)).build();
-		verifier.verify(token);
-		return verifier;
+	private DecodedJWT verifyToken(String token) {
+		try {
+			JWTVerifier verifier = JWT.require(Algorithm.HMAC256(JWT_SECRET))
+					.withIssuer("hn-ecommerce")
+					.build();
+			
+			DecodedJWT decodedJWT = verifier.verify(token);
+			if (invalidatedTokenService.existsById(decodedJWT.getId()))
+				throw new AppException(ErrorCode.UNAUTHENTICATED);
+			return decodedJWT;
+		} catch (JWTVerificationException e) {
+			log.error("Token verification failed: {}", e.getMessage());
+			throw new AppException(ErrorCode.UNAUTHENTICATED);
+		}
 	}
 	
 	private String buildScope(User user) {
@@ -109,8 +122,22 @@ public class AuthBusiness {
 		return stringJoiner.toString();
 	}
 	
-	public void logOut(LogOutRequest token) {
-		AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-		
+	@Transactional
+	public void logOut(LogOutRequest logOutRequest) {
+		try {
+			DecodedJWT decodedJWT = verifyToken(logOutRequest.getToken());
+			
+			InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+					.id(decodedJWT.getId())
+					.expiryTime(decodedJWT.getExpiresAt())
+					.build();
+			
+			invalidatedTokenService.save(invalidatedToken);
+			
+			log.info("Token with JTI {} has been invalidated", decodedJWT.getId());
+		} catch (AppException e) {
+			log.error("Failed to logout: {}", e.getMessage());
+			throw e;
+		}
 	}
 }

@@ -7,5 +7,6 @@ import vn.hn.hncoreservice.dao.model.InvalidatedToken;
 
 @Repository
 public interface InvalidatedTokenRepo extends JpaRepository<InvalidatedToken, String>, JpaSpecificationExecutor<InvalidatedToken> {
-
+	boolean existsById(String id);
+	
 }

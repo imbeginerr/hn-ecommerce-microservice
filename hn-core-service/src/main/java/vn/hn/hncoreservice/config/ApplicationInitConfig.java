@@ -13,6 +13,7 @@ import vn.hn.hncoreservice.dao.model.User;
 import vn.hn.hncoreservice.dao.service.PermissionService;
 import vn.hn.hncoreservice.dao.service.RoleService;
 import vn.hn.hncoreservice.dao.service.UserService;
+import vn.hn.hncoreservice.enums.Roles;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,47 +37,47 @@ public class ApplicationInitConfig {
 	@Bean
 	public ApplicationRunner initializeData() {
 		return args -> {
-			log.info("🚀 Initializing default roles and admin user...");
+			log.info("Initializing default roles and admin user...");
 			
 			initAdminRole();
 			initUserRole();
 			initAdminUser();
 			
-			log.info("✅ Data initialization completed");
+			log.info(" Data initialization completed");
 		};
 	}
 	
 	private void initAdminRole() {
-		if (roleService.findByName("ADMIN").isEmpty()) {
+		if (roleService.findByName(Roles.ADMIN.getValue()).isEmpty()) {
 			Set<Permission> allPermissions = new HashSet<>(permissionService.findAll());
-			log.info("✅ Created ADMIN role with {} permissions", allPermissions);
+			log.info("Created ADMIN role with {} permissions", allPermissions);
 			Role adminRole = new Role();
-			adminRole.setName("ADMIN");
+			adminRole.setName(Roles.ADMIN.getValue());
 			adminRole.setPermissions(allPermissions);
 			adminRole.setDecription("Full system access");
 			roleService.save(adminRole);
-			log.info("✅ Created ADMIN role with {} permissions", allPermissions.size());
+			log.info("Created ADMIN role with {} permissions", allPermissions.size());
 		}
 	}
 	
 	private void initUserRole() {
-		if (roleService.findByName("USER").isEmpty()) {
+		if (roleService.findByName(Roles.USER.getValue()).isEmpty()) {
 			Set<Permission> userPermissions = new HashSet<>();
 			
 			addPermissionIfExists(userPermissions);
 			
 			Role userRole = new Role();
-			userRole.setName("USER");
+			userRole.setName(Roles.USER.getValue());
 			userRole.setPermissions(userPermissions);
 			userRole.setDecription("Basic user access");
 			roleService.save(userRole);
-			log.info("✅ Created USER role");
+			log.info("Created USER role");
 		}
 	}
 	
 	private void initAdminUser() {
 		if (userService.findByUsername("admin").isEmpty()) {
-			Role adminRole = roleService.findByName("ADMIN")
+			Role adminRole = roleService.findByName(Roles.ADMIN.getValue())
 					.orElseThrow(() -> new RuntimeException("ADMIN role not found"));
 			
 			User admin = new User();
@@ -85,7 +86,7 @@ public class ApplicationInitConfig {
 			admin.setFullName("Administrator");
 			admin.setRoles(Set.of(adminRole));
 			userService.save(admin);
-			log.warn("⚠️  Created admin user: admin / admin");
+			log.warn("Created admin user: admin / admin");
 		}
 	}
 	

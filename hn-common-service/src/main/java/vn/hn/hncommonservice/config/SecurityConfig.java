@@ -31,7 +31,8 @@ public class SecurityConfig {
 			"/auth/introspect",
 			"/auth/refresh-token",
 			"/public/**",
-			"/user"
+			"/user",
+			"auth/logout"
 	};
 	
 	@NonFinal
