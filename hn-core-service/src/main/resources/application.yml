@@ -27,6 +27,7 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  signer-key: n6fGz1ROb3rSITWoau8qJmjvnlyybDj5sa2hR+qB4Vc=
-  jwt-expiration: 36000
-  refresh-expiration: 2592000000
+  signer-key: ${SECRET_KEY}
+  jwt-expiration: 3600000 #1 hour = 3600000ms
+  refresh-expiration: 2592000000 #30 days = 2592000000ms
+  issuer: hn-ecommerce

@@ -50,14 +50,11 @@ public class UserBusiness {
 		user.setRoles(roles);
 		User savedUser = userService.save(user);
 		
-		log.info("User created with id: {}", savedUser.getId());
-		
 		return userMapper.toCreateResponse(savedUser);
 	}
 	
 	@Transactional
 	public UserUpdateResponse update(Long id, UserUpdateRequest request) {
-		log.info("Updating user id: {}", id);
 		
 		User user = userService.findByIdAndDeletedFalse(id)
 				.orElseThrow(() -> new RuntimeException(STR."Không tìm thấy user với id: \{id}"));
@@ -72,15 +69,12 @@ public class UserBusiness {
 		}
 		User updatedUser = userService.save(user);
 		
-		log.info("User updated successfully");
-		
 		return userMapper.toUpdateResponse(updatedUser);
 	}
 	
 	@Transactional(readOnly = true)
 	@PostAuthorize("returnObject.username == authentication.name")
 	public UserResponse findById(Long id) {
-		log.info("Fetching user id: {}", id);
 		
 		User user = userService.findByIdAndDeletedFalse(id)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy user với id: " + id));
@@ -97,20 +91,16 @@ public class UserBusiness {
 	
 	@Transactional
 	public void delete(Long id) {
-		log.info("Deleting user id: {}", id);
 		
 		User user = userService.findByIdAndDeletedFalse(id)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy user với id: " + id));
 		
 		user.softDelete();
 		userService.save(user);
-		
-		log.info("User deleted successfully");
 	}
 	
 	@Transactional
 	public void restore(Long id) {
-		log.info("Restoring user id: {}", id);
 		
 		User user = userService.findById(id)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy user với id: " + id));
@@ -118,7 +108,6 @@ public class UserBusiness {
 		user.restore();
 		userService.save(user);
 		
-		log.info("User restored successfully");
 	}
 	
 	@Transactional

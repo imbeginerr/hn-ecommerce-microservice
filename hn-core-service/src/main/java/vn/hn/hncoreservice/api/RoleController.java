@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import vn.hn.hncommonservice.annotation.RequirePermission;
 import vn.hn.hncommonservice.entity.ApiResponse;
@@ -45,11 +44,6 @@ public class RoleController {
 	@RequirePermission(name = "CoreRoleList", description = "List role")
 	@PreAuthorize("hasAuthority('CoreRoleList')")
 	public ApiResponse<Page<RoleResponse>> findAll(RoleSearchCriteria criteria) {
-		var authentication = SecurityContextHolder.getContext().getAuthentication();
-		log.info("Rolename: {}", authentication.getName());
-		authentication.getAuthorities().forEach(authority -> {
-			log.info("Authorities: {}", authority.getAuthority());
-		});
 		Page<RoleResponse> pageRoleResponse = roleBusiness.findAll(criteria);
 		return ApiResponse.success(pageRoleResponse);
 	}

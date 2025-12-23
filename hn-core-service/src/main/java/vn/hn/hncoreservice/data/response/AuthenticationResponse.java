@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class AuthenticationResponse {
 	private String token;
-	boolean authenticated;
+	private String refreshToken;
+	private boolean authenticated;
 }

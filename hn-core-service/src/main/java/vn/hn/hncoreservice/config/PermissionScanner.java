@@ -32,8 +32,6 @@ public class PermissionScanner {
 	 */
 	@EventListener(ApplicationReadyEvent.class)
 	public void scanAndRegisterPermissions() {
-		log.info("Starting permission scanning for service: {}", applicationName);
-		
 		Set<PermissionInfo> discoveredPermissions = new HashSet<>();
 		
 		// Lấy tất cả beans có annotation @RestController hoặc @Controller
@@ -68,7 +66,6 @@ public class PermissionScanner {
 		// Sync vào database
 		syncPermissionsToDatabase(discoveredPermissions);
 		
-		log.info("Permission scanning completed. Registered {} permissions", discoveredPermissions.size());
 	}
 	
 	private PermissionInfo extractPermissionInfo(RequirePermission annotation) {
@@ -95,21 +92,18 @@ public class PermissionScanner {
 				newPermission.setName(info.name);
 				newPermission.setDecription(info.description);
 				permissionsToSave.add(newPermission);
-				log.info("New permission discovered: {}", info.name);
 			} else {
 				// Update description nếu thay đổi
 				Permission existing = existingPermission.get();
 				if (!info.description.equals(existing.getDecription())) {
 					existing.setDecription(info.description);
 					permissionsToSave.add(existing);
-					log.info("Updated permission description: {}", info.name);
 				}
 			}
 		}
 		
 		if (!permissionsToSave.isEmpty()) {
 			permissionRepo.saveAll(permissionsToSave);
-			log.info("Saved {} permissions to database", permissionsToSave.size());
 		}
 	}
 	

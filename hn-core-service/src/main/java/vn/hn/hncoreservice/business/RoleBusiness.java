@@ -39,7 +39,6 @@ public class RoleBusiness {
 	
 	@Transactional
 	public RoleResponse update(String name, RoleRequest request) {
-		log.info("Updating role id: {}", name);
 		
 		roleService.findByNameAndDeletedFalse(name)
 				.orElseThrow(() -> new RuntimeException(STR."Không tìm thấy role với name: \{name}"));
@@ -48,14 +47,11 @@ public class RoleBusiness {
 		
 		Role updatedRole = roleService.save(role);
 		
-		log.info("Role updated successfully");
-		
 		return roleMapper.toRoleResponse(updatedRole);
 	}
 	
 	@Transactional(readOnly = true)
 	public RoleResponse findByName(String name) {
-		log.info("Fetching role id: {}", name);
 		
 		Role role = roleService.findByNameAndDeletedFalse(name)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy role với name: " + name));
@@ -72,28 +68,22 @@ public class RoleBusiness {
 	
 	@Transactional
 	public void delete(String name) {
-		log.info("Deleting role id: {}", name);
 		
 		Role role = roleService.findByNameAndDeletedFalse(name)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy role với name: " + name));
 		
 		role.softDelete();
 		roleService.save(role);
-		
-		log.info("Role deleted successfully");
 	}
 	
 	@Transactional
 	public void restore(String name) {
-		log.info("Restoring role id: {}", name);
-		
 		Role role = roleService.findByName(name)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy role với name: " + name));
 		
 		role.restore();
 		roleService.save(role);
 		
-		log.info("Role restored successfully");
 	}
 	
 }

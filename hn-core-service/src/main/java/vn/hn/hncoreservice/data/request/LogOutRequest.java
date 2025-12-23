@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class LogOutRequest {
-	
-	private String token;
-	
+	private String accessToken;   // Optional - có thể lấy từ header
+	private String refreshToken;  // Required
 }

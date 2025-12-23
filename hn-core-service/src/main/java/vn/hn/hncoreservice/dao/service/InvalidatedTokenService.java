@@ -7,6 +7,6 @@ import vn.hn.hncoreservice.dao.model.InvalidatedToken;
 public interface InvalidatedTokenService {
 	InvalidatedToken save(InvalidatedToken invalidatedToken);
 	
-	boolean existsById(String id);
+	boolean isTokenInvalidated(String id);
 	
 }

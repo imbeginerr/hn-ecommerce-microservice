@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import vn.hn.hncommonservice.annotation.RequirePermission;
 import vn.hn.hncommonservice.entity.ApiResponse;
@@ -52,11 +51,6 @@ public class UserController {
 	@RequirePermission(name = "CoreUserList", description = "List user")
 	@PreAuthorize("hasAuthority('CoreUserList')")
 	public ApiResponse<Page<UserResponse>> findAll(UserSearchCriteria criteria) {
-		var authentication = SecurityContextHolder.getContext().getAuthentication();
-		log.info("Username: {}", authentication.getName());
-		authentication.getAuthorities().forEach(authority -> {
-			log.info("Authorities: {}", authority.getAuthority());
-		});
 		Page<UserResponse> pageUserResponse = userBusiness.findAll(criteria);
 		return ApiResponse.success(pageUserResponse);
 	}

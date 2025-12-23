@@ -27,14 +27,11 @@ public class PermissionBusiness {
 		Permission permission = permissionMapper.toPermission(request);
 		Permission savedPermission = permissionService.save(permission);
 		
-		log.info("Permission created with id: {}", savedPermission.getName());
-		
 		return permissionMapper.toPermissionResponse(savedPermission);
 	}
 	
 	@Transactional
 	public PermissionResponse update(String name, PermissionRequest request) {
-		log.info("Updating permission id: {}", name);
 		
 		permissionService.findByNameAndDeletedFalse(name)
 				.orElseThrow(() -> new RuntimeException(STR."Không tìm thấy permission với name: \{name}"));
@@ -43,14 +40,11 @@ public class PermissionBusiness {
 		
 		Permission updatedPermission = permissionService.save(permission);
 		
-		log.info("Permission updated successfully");
-		
 		return permissionMapper.toPermissionResponse(updatedPermission);
 	}
 	
 	@Transactional(readOnly = true)
 	public PermissionResponse findByName(String name) {
-		log.info("Fetching permission id: {}", name);
 		
 		Permission permission = permissionService.findByNameAndDeletedFalse(name)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy permission với name: " + name));
@@ -67,7 +61,6 @@ public class PermissionBusiness {
 	
 	@Transactional
 	public void delete(String name) {
-		log.info("Deleting permission id: {}", name);
 		
 		Permission permission = permissionService.findByNameAndDeletedFalse(name)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy permission với name: " + name));
@@ -75,12 +68,10 @@ public class PermissionBusiness {
 		permission.softDelete();
 		permissionService.save(permission);
 		
-		log.info("Permission deleted successfully");
 	}
 	
 	@Transactional
 	public void restore(String name) {
-		log.info("Restoring permission id: {}", name);
 		
 		Permission permission = permissionService.findByName(name)
 				.orElseThrow(() -> new RuntimeException("Không tìm thấy permission với name: " + name));
@@ -88,6 +79,5 @@ public class PermissionBusiness {
 		permission.restore();
 		permissionService.save(permission);
 		
-		log.info("Permission restored successfully");
 	}
 }

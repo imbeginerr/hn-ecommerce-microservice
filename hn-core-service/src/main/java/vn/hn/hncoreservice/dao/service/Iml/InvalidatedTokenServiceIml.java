@@ -1,12 +1,13 @@
 package vn.hn.hncoreservice.dao.service.Iml;
 
 import org.springframework.stereotype.Service;
+import vn.hn.hncommonservice.service.IsTokenInvalidated;
 import vn.hn.hncoreservice.dao.model.InvalidatedToken;
 import vn.hn.hncoreservice.dao.service.InvalidatedTokenRepo;
 import vn.hn.hncoreservice.dao.service.InvalidatedTokenService;
 
 @Service
-public class InvalidatedTokenServiceIml implements InvalidatedTokenService {
+public class InvalidatedTokenServiceIml implements InvalidatedTokenService, IsTokenInvalidated {
 	private final InvalidatedTokenRepo repo;
 	
 	public InvalidatedTokenServiceIml(InvalidatedTokenRepo repo) {
@@ -19,8 +20,8 @@ public class InvalidatedTokenServiceIml implements InvalidatedTokenService {
 	}
 	
 	@Override
-	public boolean existsById(String id) {
-		return repo.existsById(id);
+	public boolean isTokenInvalidated(String jti) {
+		return repo.existsById(jti);
 	}
 	
 }

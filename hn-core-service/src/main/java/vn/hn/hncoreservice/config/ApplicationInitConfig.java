@@ -37,26 +37,22 @@ public class ApplicationInitConfig {
 	@Bean
 	public ApplicationRunner initializeData() {
 		return args -> {
-			log.info("Initializing default roles and admin user...");
 			
 			initAdminRole();
 			initUserRole();
 			initAdminUser();
 			
-			log.info(" Data initialization completed");
 		};
 	}
 	
 	private void initAdminRole() {
 		if (roleService.findByName(Roles.ADMIN.getValue()).isEmpty()) {
 			Set<Permission> allPermissions = new HashSet<>(permissionService.findAll());
-			log.info("Created ADMIN role with {} permissions", allPermissions);
 			Role adminRole = new Role();
 			adminRole.setName(Roles.ADMIN.getValue());
 			adminRole.setPermissions(allPermissions);
 			adminRole.setDecription("Full system access");
 			roleService.save(adminRole);
-			log.info("Created ADMIN role with {} permissions", allPermissions.size());
 		}
 	}
 	
@@ -71,7 +67,6 @@ public class ApplicationInitConfig {
 			userRole.setPermissions(userPermissions);
 			userRole.setDecription("Basic user access");
 			roleService.save(userRole);
-			log.info("Created USER role");
 		}
 	}
 	
@@ -86,7 +81,6 @@ public class ApplicationInitConfig {
 			admin.setFullName("Administrator");
 			admin.setRoles(Set.of(adminRole));
 			userService.save(admin);
-			log.warn("Created admin user: admin / admin");
 		}
 	}
 	
