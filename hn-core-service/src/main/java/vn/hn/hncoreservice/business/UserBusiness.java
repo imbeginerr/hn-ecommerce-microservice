@@ -54,6 +54,31 @@ public class UserBusiness {
 	}
 	
 	@Transactional
+	public UserCreateResponse createByAdmin(UserCreateRequest request) {
+		
+		if (userService.existsAllByUsernameAndDeletedFalse(request.getUsername())) {
+			throw new AppException(ErrorCode.USER_EXISTED);
+		}
+		User user = userMapper.toEntity(request);
+		user.setPassword(passwordEncoder.encode(request.getPassword()));
+		
+		if (request.getRoles() == null || request.getRoles().isEmpty()) {
+			HashSet<Role> roles = new HashSet<>();
+			roleService.findByName(Roles.USER.getValue()).ifPresent(roles::add);
+			user.setRoles(roles);
+		} else {
+			var roles = roleService.findAllByNameIn(request.getRoles());
+			if (roles.size() != request.getRoles().size()) {
+				throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+			}
+			user.setRoles(roles);
+		}
+		User savedUser = userService.save(user);
+		
+		return userMapper.toCreateResponse(savedUser);
+	}
+	
+	@Transactional
 	public UserUpdateResponse update(Long id, UserUpdateRequest request) {
 		
 		User user = userService.findByIdAndDeletedFalse(id)
@@ -65,6 +90,9 @@ public class UserBusiness {
 		}
 		if (request.getRoles() != null) {
 			var roles = roleService.findAllByNameIn(request.getRoles());
+			if (roles.size() != request.getRoles().size()) {
+				throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+			}
 			user.setRoles(roles);
 		}
 		User updatedUser = userService.save(user);
@@ -118,5 +146,21 @@ public class UserBusiness {
 		
 		User user = userService.findByUsernameAndDeletedFalse(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		return userMapper.toResponse(user);
+	}
+	
+	@Transactional
+	@PostAuthorize("returnObject.username == authentication.name")
+	public UserUpdateResponse updateMyInfo(UserUpdateRequest request) {
+		var context = SecurityContextHolder.getContext();
+		String name = context.getAuthentication().getName();
+		User user = userService.findByUsernameAndDeletedFalse(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		
+		userMapper.updateEntity(request, user);
+		if (request.getPassword() != null) {
+			user.setPassword(passwordEncoder.encode(request.getPassword()));
+		}
+		User updatedUser = userService.save(user);
+		
+		return userMapper.toUpdateResponse(updatedUser);
 	}
 }

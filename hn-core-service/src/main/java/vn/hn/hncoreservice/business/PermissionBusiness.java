@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.hn.hncommonservice.exception.AppException;
+import vn.hn.hncommonservice.exception.ErrorCode;
 import vn.hn.hncommonservice.utils.CoreUtils;
 import vn.hn.hncoreservice.dao.model.Permission;
 import vn.hn.hncoreservice.dao.service.PermissionService;
@@ -33,10 +35,10 @@ public class PermissionBusiness {
 	@Transactional
 	public PermissionResponse update(String name, PermissionRequest request) {
 		
-		permissionService.findByNameAndDeletedFalse(name)
-				.orElseThrow(() -> new RuntimeException(STR."Không tìm thấy permission với name: \{name}"));
+		Permission permission = permissionService.findByNameAndDeletedFalse(name)
+				.orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_FOUND));
 		
-		Permission permission = permissionMapper.toPermission(request);
+		permission.setDecription(request.getDescription());
 		
 		Permission updatedPermission = permissionService.save(permission);
 		

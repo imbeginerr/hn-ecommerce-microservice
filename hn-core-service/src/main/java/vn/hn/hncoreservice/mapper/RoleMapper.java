@@ -9,7 +9,9 @@ import vn.hn.hncoreservice.data.response.RoleResponse;
 @Mapper(componentModel = "spring")
 public interface RoleMapper {
 	@Mapping(target = "permissions", ignore = true)
+	@Mapping(target = "decription", source = "description")
 	Role toRole(RoleRequest request);
 	
+	@Mapping(target = "description", source = "decription")
 	RoleResponse toRoleResponse(Role role);
 }

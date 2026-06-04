@@ -22,12 +22,15 @@ public class UserCreateRequest {
 			regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
 			message = "INVALID_PASSWORD"
 	)
+	@NotBlank
 	private String password;
 	
 	private String fullName;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
 	private LocalDate dob;
+	
+	private String address;
 	
 	private Set<String> roles;
 }

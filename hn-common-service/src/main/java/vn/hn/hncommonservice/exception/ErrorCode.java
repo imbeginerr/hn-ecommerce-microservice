@@ -19,6 +19,7 @@ public enum ErrorCode {
 	TOKEN_ALREADY_INVALIDATED(1008, "Token đã được logout trước đó", HttpStatus.BAD_REQUEST),
 	TOKEN_INVALID(1009, "Token không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),
 	ROLE_NOT_FOUND(1010, "Role không tồn tại", HttpStatus.NOT_FOUND),
+	PERMISSION_NOT_FOUND(1011, "Permission không tồn tại", HttpStatus.NOT_FOUND),
 	;
 	
 	ErrorCode(int code, String message, HttpStatusCode httpStatuscode) {

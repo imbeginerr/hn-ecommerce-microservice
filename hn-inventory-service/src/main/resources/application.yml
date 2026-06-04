@@ -4,12 +4,12 @@ spring:
   application:
     name: hn-inventory-service
   datasource:
-    url: jdbc:postgresql://localhost:5435/hn-inventory-service
+    url: jdbc:postgresql://localhost:5435/hn_inventory_service
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -21,3 +21,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
+
+jwt:
+  signer-key: ${SECRET_KEY}
+  issuer: hn-ecommerce

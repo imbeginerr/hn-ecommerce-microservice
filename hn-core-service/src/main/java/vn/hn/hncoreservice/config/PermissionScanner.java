@@ -8,10 +8,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import vn.hn.hncommonservice.annotation.RequirePermission;
 import vn.hn.hncoreservice.dao.model.Permission;
+import vn.hn.hncoreservice.dao.model.Role;
 import vn.hn.hncoreservice.dao.service.PermissionRepo;
+import vn.hn.hncoreservice.dao.service.RoleRepo;
+import vn.hn.hncoreservice.enums.Roles;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -23,6 +27,7 @@ public class PermissionScanner {
 	
 	private final ApplicationContext applicationContext;
 	private final PermissionRepo permissionRepo;
+	private final RoleRepo roleRepo;
 	
 	@Value("${spring.application.name:unknown}")
 	private String applicationName;
@@ -31,6 +36,7 @@ public class PermissionScanner {
 	 * Tự động scan và tạo permissions khi application startup EventListener này chạy SAU KHI app đã start xong
 	 */
 	@EventListener(ApplicationReadyEvent.class)
+	@Transactional
 	public void scanAndRegisterPermissions() {
 		Set<PermissionInfo> discoveredPermissions = new HashSet<>();
 		
@@ -65,6 +71,7 @@ public class PermissionScanner {
 		
 		// Sync vào database
 		syncPermissionsToDatabase(discoveredPermissions);
+		syncAdminRolePermissions();
 		
 	}
 	
@@ -105,6 +112,17 @@ public class PermissionScanner {
 		if (!permissionsToSave.isEmpty()) {
 			permissionRepo.saveAll(permissionsToSave);
 		}
+	}
+	
+	private void syncAdminRolePermissions() {
+		Optional<Role> adminRoleOptional = roleRepo.findByName(Roles.ADMIN.getValue());
+		if (adminRoleOptional.isEmpty()) {
+			return;
+		}
+		
+		Role adminRole = adminRoleOptional.get();
+		adminRole.setPermissions(new HashSet<>(permissionRepo.findAll()));
+		roleRepo.save(adminRole);
 	}
 	
 	// Inner class để lưu thông tin permission tạm thời

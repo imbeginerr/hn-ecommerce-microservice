@@ -24,6 +24,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(apiResponse);
 	}
 	
+	@ExceptionHandler(value = IllegalArgumentException.class)
+	ResponseEntity<ApiResponse> handlingIllegalArgumentException(IllegalArgumentException e) {
+		ApiResponse apiResponse = new ApiResponse<>();
+		apiResponse.setMessage(e.getMessage());
+		apiResponse.setCode(ErrorCode.INVALID_KEY.getCode());
+		return ResponseEntity.badRequest().body(apiResponse);
+	}
+	
 	@ExceptionHandler(value = AppException.class)
 	ResponseEntity<ApiResponse> handlingAppException(AppException e) {
 		ApiResponse apiResponse = new ApiResponse<>();

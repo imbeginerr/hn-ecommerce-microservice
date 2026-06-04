@@ -21,6 +21,8 @@ public class UserUpdateRequest {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
 	private LocalDate dob;
 	
+	private String address;
+	
 	private Set<String> roles;
 	
 }

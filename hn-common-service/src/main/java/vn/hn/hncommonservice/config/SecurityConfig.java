@@ -27,6 +27,9 @@ public class SecurityConfig {
 			"/auth/introspect",
 			"/auth/refresh-token",
 			"/public/**",
+			"/uploads/**",
+			"/products/public",
+			"/products/public/**",
 			"/user",
 			"/auth/logout"
 	};
@@ -45,6 +48,7 @@ public class SecurityConfig {
 				
 				// Authorization rules
 				.authorizeHttpRequests(auth -> auth
+								.requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
 								.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
 								.anyRequest().authenticated()
 				                      )

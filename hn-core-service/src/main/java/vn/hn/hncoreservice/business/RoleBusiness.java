@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.hn.hncommonservice.exception.AppException;
+import vn.hn.hncommonservice.exception.ErrorCode;
 import vn.hn.hncommonservice.utils.CoreUtils;
 import vn.hn.hncoreservice.dao.model.Role;
 import vn.hn.hncoreservice.dao.service.PermissionService;
@@ -30,8 +32,13 @@ public class RoleBusiness {
 		
 		var role = roleMapper.toRole(request);
 		
-		var permissions = permissionService.findAllByNameIn(request.getPermissions());
-		role.setPermissions(new HashSet<>(permissions));
+		if (request.getPermissions() != null && !request.getPermissions().isEmpty()) {
+			var permissions = permissionService.findAllByNameIn(request.getPermissions());
+			if (permissions.size() != request.getPermissions().size()) {
+				throw new AppException(ErrorCode.PERMISSION_NOT_FOUND);
+			}
+			role.setPermissions(new HashSet<>(permissions));
+		}
 		
 		role = roleService.save(role);
 		return roleMapper.toRoleResponse(role);
@@ -40,10 +47,17 @@ public class RoleBusiness {
 	@Transactional
 	public RoleResponse update(String name, RoleRequest request) {
 		
-		roleService.findByNameAndDeletedFalse(name)
+		Role role = roleService.findByNameAndDeletedFalse(name)
 				.orElseThrow(() -> new RuntimeException(STR."Không tìm thấy role với name: \{name}"));
 		
-		Role role = roleMapper.toRole(request);
+		role.setDecription(request.getDescription());
+		if (request.getPermissions() != null) {
+			var permissions = permissionService.findAllByNameIn(request.getPermissions());
+			if (permissions.size() != request.getPermissions().size()) {
+				throw new AppException(ErrorCode.PERMISSION_NOT_FOUND);
+			}
+			role.setPermissions(new HashSet<>(permissions));
+		}
 		
 		Role updatedRole = roleService.save(role);
 		

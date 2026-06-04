@@ -37,6 +37,9 @@ public class User extends BaseEntity {
 	@Column(name = "dob")
 	private LocalDate dob;
 	
+	@Column(name = "address")
+	private String address;
+	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "core_user_roles",

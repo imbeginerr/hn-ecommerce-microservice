@@ -33,6 +33,14 @@ public class UserController {
 		return ApiResponse.created(userCreateResponse);
 	}
 	
+	@PostMapping(value = {"/admin"})
+	@RequirePermission(name = "CoreUserCreate", description = "Create new user")
+	@PreAuthorize("hasAuthority('CoreUserCreate')")
+	public ApiResponse<UserCreateResponse> createByAdmin(@Valid @RequestBody UserCreateRequest userCreateRequest) {
+		UserCreateResponse userCreateResponse = userBusiness.createByAdmin(userCreateRequest);
+		return ApiResponse.created(userCreateResponse);
+	}
+	
 	@DeleteMapping(value = {"/{id}"})
 	@RequirePermission(name = "CoreUserDelete", description = "Delete user")
 	@PreAuthorize("hasAuthority('CoreUserDelete')")
@@ -91,9 +99,16 @@ public class UserController {
 	
 	@GetMapping(value = {"/myifo"})
 	@RequirePermission(name = "CoreUserGetMySelf", description = "GetMySelf user")
-	@PreAuthorize("hasAuthority('CoreUserGetMySelf')")
+	@PreAuthorize("hasAnyAuthority('CoreUserGetMySelf', 'ROLE_USER')")
 	public ApiResponse<UserResponse> getMyInfo() throws
 			EntityNotFoundException {
 		return ApiResponse.success(userBusiness.getMyInfo());
+	}
+	
+	@PutMapping(value = {"/myifo"})
+	@RequirePermission(name = "CoreUserUpdate", description = "Update my profile")
+	@PreAuthorize("hasAnyAuthority('CoreUserUpdate', 'ROLE_USER')")
+	public ApiResponse<UserUpdateResponse> updateMyInfo(@Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+		return ApiResponse.success(userBusiness.updateMyInfo(userUpdateRequest));
 	}
 }

@@ -26,7 +26,7 @@ public class RoleController {
 	
 	@PostMapping(value = {""})
 	@RequirePermission(name = "CoreRoleCreate", description = "Create new role")
-	@PreAuthorize("hasAuthority('CoreRoleCreate')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ApiResponse<RoleResponse> create(@Valid @RequestBody RoleRequest roleRequest) {
 		RoleResponse roleCreateResponse = roleBusiness.create(roleRequest);
 		return ApiResponse.created(roleCreateResponse);
@@ -34,7 +34,7 @@ public class RoleController {
 	
 	@DeleteMapping(value = {"/{name}"})
 	@RequirePermission(name = "CoreRoleDelete", description = "Delete role")
-	@PreAuthorize("hasAuthority('CoreRoleDelete')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ApiResponse<Void> delete(@PathVariable("name") String name) throws EntityNotFoundException {
 		roleBusiness.delete(name);
 		return ApiResponse.deleted();
@@ -58,7 +58,7 @@ public class RoleController {
 	
 	@PutMapping(value = {"/{name}"})
 	@RequirePermission(name = "CoreRoleUpdate", description = "Update role")
-	@PreAuthorize("hasAuthority('CoreRoleUpdate')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ApiResponse<RoleResponse> update(@PathVariable("name") String name, @Valid @RequestBody RoleRequest roleRequest) throws
 			EntityNotFoundException {
 		RoleResponse roleUpdateResponse = roleBusiness.update(name, roleRequest);
@@ -67,7 +67,7 @@ public class RoleController {
 	
 	@PostMapping(value = {"/restore/{name}"})
 	@RequirePermission(name = "CoreRoleRestore", description = "Restore role")
-	@PreAuthorize("hasAuthority('CoreRoleRestore')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ApiResponse<Void> update(@PathVariable("name") String name) throws
 			RuntimeException {
 		roleBusiness.restore(name);
